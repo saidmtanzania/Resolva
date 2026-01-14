@@ -1,0 +1,112 @@
+########################################
+# GENERAL
+########################################
+*.log
+logs/
+tmp/
+temp/
+.cache/
+
+########################################
+# OS / Editor
+########################################
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.sln.docstates
+
+########################################
+# .NET / ASP.NET Core
+########################################
+bin/
+obj/
+out/
+artifacts/
+publish/
+
+**/bin/
+**/obj/
+
+########################################
+# EF Core / Local DB
+########################################
+*.db
+*.db-shm
+*.db-wal
+
+########################################
+# .NET Secrets
+########################################
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Production.json
+secrets.json
+
+########################################
+# Node.js / Express
+########################################
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-lock.yaml
+
+########################################
+# Next.js
+########################################
+.next/
+out/
+.vercel/
+.next-cache/
+
+########################################
+# Environment variables
+########################################
+.env
+.env.*
+!.env.example
+
+########################################
+# n8n (self-hosted)
+########################################
+.n8n/
+n8n/
+n8n_data/
+*.sqlite
+*.sqlite3
+
+########################################
+# Docker
+########################################
+docker-compose.override.yml
+.env.docker
+*.env.docker
+
+########################################
+# Certificates / Keys
+########################################
+*.pfx
+*.pem
+*.crt
+*.key
+
+########################################
+# Coverage / Tests
+########################################
+coverage/
+TestResults/
+
+########################################
+# Temporary / Backup
+########################################
+*.bak
+*.tmp
+*.swp
+*.orig

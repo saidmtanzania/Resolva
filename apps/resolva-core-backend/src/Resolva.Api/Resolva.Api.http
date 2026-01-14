@@ -1,0 +1,6 @@
+@Resolva.Api_HostAddress = http://localhost:5285
+
+GET {{Resolva.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

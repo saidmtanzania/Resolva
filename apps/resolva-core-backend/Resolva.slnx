@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Resolva.Api/Resolva.Api.csproj" />
+    <Project Path="src/Resolva.Core/Resolva.Core.csproj" />
+    <Project Path="src/Resolva.Infrastructure/Resolva.Infrastructure.csproj" />
+  </Folder>
+</Solution>
