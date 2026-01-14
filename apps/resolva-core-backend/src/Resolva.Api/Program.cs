@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Resolva.Core.Entities;
+using Resolva.Core.Enums;
 using Resolva.Infrastructure.Data;
 using Resolva.Infrastructure.Identity;
 using Resolva.Infrastructure.Seed;
@@ -52,7 +53,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminOnly", policy => policy.RequireRole(Roles.Admin));
+
 
 builder.Services.AddScoped<JwtTokenService>();
 
