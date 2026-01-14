@@ -14,11 +14,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DbContext
 builder.Services.AddDbContext<ResolvaDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
-// Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
 {
     opt.User.RequireUniqueEmail = true;
@@ -28,7 +26,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
 .AddEntityFrameworkStores<ResolvaDbContext>()
 .AddDefaultTokenProviders();
 
-// JWT
 var jwt = builder.Configuration.GetSection("Jwt");
 var keyBytes = Encoding.UTF8.GetBytes(jwt["Key"]!);
 
@@ -49,7 +46,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// Services
 builder.Services.AddScoped<JwtTokenService>();
 
 var app = builder.Build();
@@ -62,7 +58,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Seed on startup (MVP)
 await DbSeeder.SeedAsync(app.Services);
 
 app.Run();
