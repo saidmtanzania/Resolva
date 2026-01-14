@@ -1,23 +1,68 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Resolva.Core.Entities;
+using Resolva.Infrastructure.Data;
+using Resolva.Infrastructure.Identity;
+using Resolva.Infrastructure.Seed;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// DbContext
+builder.Services.AddDbContext<ResolvaDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+
+// Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
+    opt.Password.RequiredLength = 8;
+    opt.Password.RequireNonAlphanumeric = false;
+})
+.AddEntityFrameworkStores<ResolvaDbContext>()
+.AddDefaultTokenProviders();
+
+// JWT
+var jwt = builder.Configuration.GetSection("Jwt");
+var keyBytes = Encoding.UTF8.GetBytes(jwt["Key"]!);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(opt =>
+{
+    opt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwt["Issuer"],
+        ValidAudience = jwt["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+        ClockSkew = TimeSpan.FromSeconds(30)
+    };
+});
+
+builder.Services.AddAuthorization();
+
+// Services
+builder.Services.AddScoped<JwtTokenService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Seed on startup (MVP)
+await DbSeeder.SeedAsync(app.Services);
 
 app.Run();
