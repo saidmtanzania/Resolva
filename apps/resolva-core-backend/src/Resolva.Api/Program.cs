@@ -6,6 +6,7 @@ using Resolva.Core.Entities;
 using Resolva.Infrastructure.Data;
 using Resolva.Infrastructure.Identity;
 using Resolva.Infrastructure.Seed;
+using Resolva.Infrastructure.Tenancy;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ITenantContext, TenantContext>();
 builder.Services.AddDbContext<ResolvaDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
