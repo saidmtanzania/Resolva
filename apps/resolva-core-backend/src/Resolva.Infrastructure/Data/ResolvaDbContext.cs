@@ -19,6 +19,11 @@ public class ResolvaDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Service> Services => Set<Service>();
     public DbSet<Event> Events => Set<Event>();
+    public DbSet<SurveyTemplate> SurveyTemplates => Set<SurveyTemplate>();
+    public DbSet<SurveySession> SurveySessions => Set<SurveySession>();
+    public DbSet<SurveyResponse> SurveyResponses => Set<SurveyResponse>();
+    public DbSet<SurveyOutcome> SurveyOutcomes => Set<SurveyOutcome>();
+
 
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -74,6 +79,60 @@ public class ResolvaDbContext : IdentityDbContext<ApplicationUser>
             e.HasIndex(x => new { x.TenantId, x.Status, x.OccurredAt });
             e.HasIndex(x => new { x.TenantId, x.ProductId, x.OccurredAt });
             e.HasIndex(x => new { x.TenantId, x.ServiceId, x.OccurredAt });
+        });
+
+        builder.Entity<SurveyTemplate>(e =>
+        {
+            e.ToTable("survey_templates");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.EventType).IsRequired();
+            e.Property(x => x.Language).IsRequired();
+            e.Property(x => x.SchemaJson).HasColumnType("jsonb");
+
+            e.HasIndex(x => new { x.TenantId, x.EventType, x.Language, x.CreatedAt });
+            e.HasIndex(x => new { x.TenantId, x.EventType, x.Version });
+        });
+
+        builder.Entity<SurveySession>(e =>
+        {
+            e.ToTable("survey_sessions");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.RecipientPhone).IsRequired();
+            e.Property(x => x.Status).IsRequired();
+            e.Property(x => x.Channel).IsRequired();
+
+            // MVP: one session per event
+            e.HasIndex(x => new { x.TenantId, x.EventId }).IsUnique();
+
+            e.HasIndex(x => new { x.TenantId, x.Status, x.CreatedAt });
+            e.HasIndex(x => new { x.TenantId, x.TemplateId });
+            e.HasIndex(x => x.RecipientPhone);
+        });
+
+        builder.Entity<SurveyResponse>(e =>
+        {
+            e.ToTable("survey_responses");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.QuestionId).IsRequired();
+            e.Property(x => x.AnswerJson).HasColumnType("jsonb");
+
+            e.HasIndex(x => new { x.TenantId, x.SessionId });
+            e.HasIndex(x => new { x.TenantId, x.QuestionId });
+            e.HasIndex(x => new { x.TenantId, x.CreatedAt });
+        });
+
+        builder.Entity<SurveyOutcome>(e =>
+        {
+            e.ToTable("survey_outcomes");
+            e.HasKey(x => x.SessionId);
+
+            e.Property(x => x.ConfirmationStatus).IsRequired();
+
+            e.HasIndex(x => new { x.TenantId, x.ConfirmationStatus });
+            e.HasIndex(x => new { x.TenantId, x.ComputedAt });
         });
 
         foreach (var entityType in builder.Model.GetEntityTypes()){
