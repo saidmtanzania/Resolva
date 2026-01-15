@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Resolva.Api.Middleware;
 using Resolva.Core.Entities;
 using Resolva.Core.Enums;
 using Resolva.Infrastructure.Data;
@@ -63,6 +64,8 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseMiddleware<InternalHmacMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
