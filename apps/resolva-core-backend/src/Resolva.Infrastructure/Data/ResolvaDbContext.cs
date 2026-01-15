@@ -16,6 +16,8 @@ public class ResolvaDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<Service> Services => Set<Service>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -33,6 +35,27 @@ public class ResolvaDbContext : IdentityDbContext<ApplicationUser>
             e.HasIndex(x => x.Name);
         });
 
+        builder.Entity<Product>(e =>
+        {
+            e.ToTable("products");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Name).IsRequired();
+
+            e.HasIndex(x => new { x.TenantId, x.Name });
+            e.HasIndex( x=> new { x.TenantId, x.IsActive });
+        });
+        builder.Entity<Service>(e =>
+        {
+            e.ToTable("services");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.Name).IsRequired();
+
+            e.HasIndex(x => new { x.TenantId, x.Name });
+            e.HasIndex( x=> new { x.TenantId, x.IsActive });
+        });
+        
         foreach (var entityType in builder.Model.GetEntityTypes()){
             if (typeof(ITenantScoped).IsAssignableFrom(entityType.ClrType)){
                 // Build expression: e => CurrentTenantId.HasValue && e.TenantId == CurrentTenantId.Value
