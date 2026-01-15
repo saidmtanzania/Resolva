@@ -18,6 +18,8 @@ public class ResolvaDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Service> Services => Set<Service>();
+    public DbSet<Event> Events => Set<Event>();
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -55,7 +57,25 @@ public class ResolvaDbContext : IdentityDbContext<ApplicationUser>
             e.HasIndex(x => new { x.TenantId, x.Name });
             e.HasIndex( x=> new { x.TenantId, x.IsActive });
         });
-        
+
+        builder.Entity<Event>(e =>
+        {
+            e.ToTable("events");
+            e.HasKey(x => x.Id);
+
+            e.Property(x => x.EventType).IsRequired();
+            e.Property(x => x.ContactPhone).IsRequired();
+            e.Property(x => x.Status).IsRequired();
+
+            e.Property(x => x.Metadata).HasColumnType("jsonb");
+
+            e.HasIndex(x => new { x.TenantId, x.OccurredAt });
+            e.HasIndex(x => new { x.TenantId, x.EventType, x.OccurredAt });
+            e.HasIndex(x => new { x.TenantId, x.Status, x.OccurredAt });
+            e.HasIndex(x => new { x.TenantId, x.ProductId, x.OccurredAt });
+            e.HasIndex(x => new { x.TenantId, x.ServiceId, x.OccurredAt });
+        });
+
         foreach (var entityType in builder.Model.GetEntityTypes()){
             if (typeof(ITenantScoped).IsAssignableFrom(entityType.ClrType)){
                 // Build expression: e => CurrentTenantId.HasValue && e.TenantId == CurrentTenantId.Value
