@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Resolva.Api.Middleware;
+using Resolva.Api.Services;
 using Resolva.Core.Entities;
 using Resolva.Core.Enums;
 using Resolva.Infrastructure.Data;
@@ -34,6 +35,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(opt =>
 var jwt = builder.Configuration.GetSection("Jwt");
 var keyBytes = Encoding.UTF8.GetBytes(jwt["Key"]!);
 
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -57,6 +59,9 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("AdminOnly", policy => policy.RequireRole(Roles.Admin));
 
+builder.Services.AddHttpClient<GatewayClient>(c => {
+    c.BaseAddress = new Uri(builder.Configuration["Gateway:BaseUrl"]!);
+});
 
 builder.Services.AddScoped<JwtTokenService>();
 

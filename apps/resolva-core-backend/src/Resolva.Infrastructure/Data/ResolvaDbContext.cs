@@ -90,8 +90,13 @@ public class ResolvaDbContext : IdentityDbContext<ApplicationUser>
             e.Property(x => x.Language).IsRequired();
             e.Property(x => x.SchemaJson).HasColumnType("jsonb");
 
-            e.HasIndex(x => new { x.TenantId, x.EventType, x.Language, x.CreatedAt });
-            e.HasIndex(x => new { x.TenantId, x.EventType, x.Version });
+            e.Property(x => x.Name).IsRequired();
+            e.Property(x => x.Channel).IsRequired();
+            e.Property(x => x.ValidationErrors).HasColumnType("jsonb");
+
+            e.HasIndex(x => new { x.TenantId, x.EventType, x.Language, x.IsActive });
+            e.HasIndex(x => new { x.TenantId, x.WhatsAppStatus });
+            e.HasIndex(x => new { x.TenantId, x.CreatedAt });
         });
 
         builder.Entity<SurveySession>(e =>
